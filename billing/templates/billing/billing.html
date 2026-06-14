@@ -1,0 +1,104 @@
+{% extends 'billing/base.html' %}
+{% load static %}
+{% block title %}Billing | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <p class="eyebrow">Point of Sale</p>
+        <h1>Billing</h1>
+    </div>
+    <button class="btn btn-outline-primary" id="startScanner"><i class="bi bi-camera-video me-2"></i>Scan Barcode</button>
+</div>
+
+<div class="pos-grid">
+    <section class="panel">
+        <div class="section-head">
+            <h2>Product Detection</h2>
+            <span class="soft-badge">Fetch API</span>
+        </div>
+        <div id="scanner" class="scanner-box d-none"></div>
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">Barcode</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-upc"></i></span>
+                    <input id="barcodeInput" class="form-control" placeholder="Scan or type barcode">
+                </div>
+            </div>
+            <div class="col-md-7">
+                <label class="form-label">Product Search</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="productSearch" class="form-control" placeholder="Name, brand, barcode">
+                </div>
+            </div>
+        </div>
+        <div id="productResults" class="product-results mt-3"></div>
+    </section>
+
+    <aside class="panel">
+        <div class="section-head">
+            <h2>Customer</h2>
+        </div>
+        <label class="form-label">Phone Number</label>
+        <input id="customerPhone" class="form-control mb-3" placeholder="Customer phone">
+        <label class="form-label">Customer Name</label>
+        <input id="customerName" class="form-control" placeholder="Walk-in Customer">
+    </aside>
+</div>
+
+<section class="panel mt-4">
+    <div class="section-head">
+        <h2>Cart</h2>
+        <button class="btn btn-sm btn-outline-secondary" id="clearCart"><i class="bi bi-trash3 me-1"></i>Clear</button>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Product Name</th><th>Barcode</th><th>Quantity</th><th>Unit Price</th><th>Total Price</th><th></th></tr></thead>
+            <tbody id="cartBody"></tbody>
+        </table>
+    </div>
+    <div class="totals-grid">
+        <div>
+            <label class="form-label">Discount</label>
+            <input id="discount" class="form-control" type="number" min="0" step="0.01" value="0">
+        </div>
+        <div>
+            <label class="form-label">Tax %</label>
+            <input id="taxPercent" class="form-control" type="number" min="0" step="0.01" value="0">
+        </div>
+        <div>
+            <label class="form-label">GST %</label>
+            <input id="gstPercent" class="form-control" type="number" min="0" step="0.01" value="5">
+        </div>
+        <div>
+            <label class="form-label">Payment</label>
+            <select id="paymentMethod" class="form-select">
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+                <option value="card">Card</option>
+            </select>
+        </div>
+        <div class="total-box">
+            <span>Grand Total</span>
+            <strong id="grandTotal">Rs. 0.00</strong>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 justify-content-end mt-4">
+        <button class="btn btn-primary" id="generateBill"><i class="bi bi-receipt me-2"></i>Generate Bill</button>
+        <a class="btn btn-outline-primary disabled" id="printBill" target="_blank"><i class="bi bi-printer me-2"></i>Print Bill</a>
+        <a class="btn btn-outline-primary disabled" id="downloadPdf"><i class="bi bi-file-earmark-pdf me-2"></i>Download PDF</a>
+    </div>
+</section>
+{% csrf_token %}
+{% endblock %}
+{% block extra_js %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+window.POS_ENDPOINTS = {
+    lookup: "{% url 'product_lookup' %}",
+    createBill: "{% url 'create_bill' %}"
+};
+</script>
+<script src="{% static 'billing/js/pos.js' %}"></script>
+{% endblock %}

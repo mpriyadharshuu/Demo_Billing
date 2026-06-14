@@ -1,0 +1,10 @@
+<div class="list-stack">
+    {% for bill in bills %}
+        <a class="mini-row" href="{% url 'bill_detail' bill.pk %}">
+            <span><strong>{{ bill.invoice_number }}</strong><small>{{ bill.customer_name }}</small></span>
+            <b>Rs. {{ bill.grand_total }}</b>
+        </a>
+    {% empty %}
+        <p class="empty">No bills yet.</p>
+    {% endfor %}
+</div>

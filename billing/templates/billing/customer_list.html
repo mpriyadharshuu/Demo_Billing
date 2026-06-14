@@ -1,0 +1,35 @@
+{% extends 'billing/base.html' %}
+{% block title %}Customers | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><p class="eyebrow">CRM</p><h1>Customers</h1></div>
+    <a class="btn btn-primary" href="{% url 'customer_add' %}"><i class="bi bi-person-plus me-2"></i>Add Customer</a>
+</div>
+<section class="panel">
+    <form class="toolbar" method="get">
+        <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search customers">
+        <button class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+    </form>
+    <div class="table-responsive">
+        <table class="table data-table align-middle">
+            <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Total Purchases</th><th>Last Purchase</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for customer in object_list %}
+                <tr>
+                    <td><strong>{{ customer.name }}</strong><small>{{ customer.address|truncatechars:42 }}</small></td>
+                    <td>{{ customer.phone }}</td>
+                    <td>{{ customer.email|default:"-" }}</td>
+                    <td>Rs. {{ customer.total_purchases }}</td>
+                    <td>{{ customer.last_purchase_date|date:"d M Y"|default:"-" }}</td>
+                    <td class="actions">
+                        <a class="icon-btn" title="History" href="{% url 'customer_history' customer.pk %}"><i class="bi bi-clock-history"></i></a>
+                        <a class="icon-btn" title="Edit" href="{% url 'customer_edit' customer.pk %}"><i class="bi bi-pencil"></i></a>
+                        <a class="icon-btn danger" title="Delete" href="{% url 'customer_delete' customer.pk %}"><i class="bi bi-trash3"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

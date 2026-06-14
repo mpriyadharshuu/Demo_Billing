@@ -1,0 +1,13 @@
+{% extends 'billing/base.html' %}
+{% block title %}Confirm Delete | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Confirm</p><h1>Delete {{ object }}</h1></div></div>
+<section class="panel">
+    <p class="mb-4">This record will be removed from the system.</p>
+    <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit"><i class="bi bi-trash3 me-2"></i>Delete</button>
+        <a class="btn btn-outline-secondary" href="{{ object.get_absolute_url|default:'/' }}">Cancel</a>
+    </form>
+</section>
+{% endblock %}

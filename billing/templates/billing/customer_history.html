@@ -1,0 +1,32 @@
+{% extends 'billing/base.html' %}
+{% block title %}Customer History | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><p class="eyebrow">Purchase History</p><h1>{{ object.name }}</h1></div>
+    <a class="btn btn-outline-primary" href="{% url 'customer_edit' object.pk %}"><i class="bi bi-pencil me-2"></i>Edit</a>
+</div>
+<div class="metric-grid compact">
+    <div class="metric-card"><span>Phone</span><strong>{{ object.phone }}</strong><i class="bi bi-telephone"></i></div>
+    <div class="metric-card"><span>Total Purchases</span><strong>Rs. {{ object.total_purchases }}</strong><i class="bi bi-currency-rupee"></i></div>
+    <div class="metric-card"><span>Last Purchase</span><strong>{{ object.last_purchase_date|date:"d M Y"|default:"-" }}</strong><i class="bi bi-calendar"></i></div>
+</div>
+<section class="panel mt-4">
+    <h2>Invoices</h2>
+    <div class="table-responsive">
+        <table class="table data-table align-middle">
+            <thead><tr><th>Invoice</th><th>Date</th><th>Payment</th><th>Total</th><th></th></tr></thead>
+            <tbody>
+            {% for bill in object.bills.all %}
+                <tr>
+                    <td>{{ bill.invoice_number }}</td>
+                    <td>{{ bill.created_at|date:"d M Y, h:i A" }}</td>
+                    <td>{{ bill.get_payment_method_display }}</td>
+                    <td>Rs. {{ bill.grand_total }}</td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="{% url 'bill_detail' bill.pk %}">View</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

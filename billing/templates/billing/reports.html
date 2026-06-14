@@ -1,0 +1,22 @@
+{% extends 'billing/base.html' %}
+{% block title %}Reports | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><p class="eyebrow">Exports</p><h1>Reports</h1></div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" href="{% url 'report_export' 'csv' %}">CSV</a>
+        <a class="btn btn-outline-primary" href="{% url 'report_export' 'xlsx' %}">Excel</a>
+        <a class="btn btn-primary" href="{% url 'report_export' 'pdf' %}">PDF</a>
+    </div>
+</div>
+<div class="metric-grid compact">
+    <div class="metric-card"><span>Daily Sales</span><strong>Rs. {{ daily_total }}</strong><i class="bi bi-calendar-day"></i></div>
+    <div class="metric-card"><span>Weekly Sales</span><strong>Rs. {{ weekly_total }}</strong><i class="bi bi-calendar-week"></i></div>
+    <div class="metric-card"><span>Monthly Sales</span><strong>Rs. {{ monthly_total }}</strong><i class="bi bi-calendar-month"></i></div>
+</div>
+<div class="report-grid mt-4">
+    <section class="panel"><h2>Product Sales Report</h2>{% include 'billing/partials/report_products.html' with products=product_sales %}</section>
+    <section class="panel"><h2>Customer Purchase Report</h2>{% include 'billing/partials/customer_rows.html' with customers=customer_purchases %}</section>
+    <section class="panel"><h2>Stock Report</h2>{% include 'billing/partials/product_rows.html' with products=stock_report %}</section>
+</div>
+{% endblock %}

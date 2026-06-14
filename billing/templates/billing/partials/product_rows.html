@@ -1,0 +1,10 @@
+<div class="list-stack">
+    {% for product in products %}
+        <a class="mini-row" href="{% url 'product_edit' product.pk %}">
+            <span><strong>{{ product.name }}</strong><small>{{ product.barcode }}</small></span>
+            <b>{{ product.quantity }}</b>
+        </a>
+    {% empty %}
+        <p class="empty">No products yet.</p>
+    {% endfor %}
+</div>

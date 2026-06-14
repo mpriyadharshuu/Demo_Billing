@@ -1,0 +1,30 @@
+{% extends 'billing/base.html' %}
+{% block title %}Stock Alerts | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Inventory Health</p><h1>Stock Alerts</h1></div></div>
+<div class="metric-grid compact">
+    <div class="metric-card warning"><span>Low Stock</span><strong>{{ low_stock.count }}</strong><i class="bi bi-exclamation-triangle"></i></div>
+    <div class="metric-card danger-card"><span>Out of Stock</span><strong>{{ out_of_stock.count }}</strong><i class="bi bi-x-octagon"></i></div>
+    <div class="metric-card"><span>Open Alerts</span><strong>{{ alerts.count }}</strong><i class="bi bi-bell"></i></div>
+</div>
+<section class="panel mt-4">
+    <h2>Reorder Suggestions</h2>
+    <div class="table-responsive">
+        <table class="table data-table align-middle">
+            <thead><tr><th>Product</th><th>Stock</th><th>Level</th><th>Status</th><th>Suggested Order</th><th></th></tr></thead>
+            <tbody>
+            {% for product in suggestions %}
+                <tr>
+                    <td>{{ product.name }}<small>{{ product.barcode }}</small></td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.stock_level }}</td>
+                    <td><span class="stock-pill {{ product.stock_status }}">{{ product.stock_status|title }}</span></td>
+                    <td>{{ product.stock_level|add:product.stock_level }}</td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="{% url 'product_edit' product.pk %}">Update</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'billing/base.html' %}
+{% load static %}
+{% block title %}Analytics | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Pandas Analysis</p><h1>Analytics</h1></div></div>
+{{ analytics_json|json_script:"analyticsData" }}
+<div class="chart-grid">
+    <div class="panel"><h2>Revenue Trends</h2><canvas id="revenueTrendChart"></canvas></div>
+    <div class="panel"><h2>Product Performance</h2><canvas id="productPerformanceChart"></canvas></div>
+    <div class="panel"><h2>Monthly Profit Analysis</h2><canvas id="profitChart"></canvas></div>
+    <div class="panel"><h2>Category Distribution</h2><canvas id="analyticsCategoryChart"></canvas></div>
+</div>
+<section class="panel mt-4">
+    <h2>Low Selling Products</h2>
+    <div class="table-responsive">
+        <table class="table data-table">
+            <thead><tr><th>Product</th><th>Barcode</th><th>Stock</th><th>Sold</th></tr></thead>
+            <tbody>
+            {% for product in analytics.low_selling_products %}
+                <tr><td>{{ product.name }}</td><td>{{ product.barcode }}</td><td>{{ product.quantity }}</td><td>{{ product.sold|default:0 }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'billing/js/analytics.js' %}"></script>
+{% endblock %}

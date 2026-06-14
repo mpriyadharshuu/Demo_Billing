@@ -1,0 +1,18 @@
+{% extends 'billing/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}{{ title|default:"Form" }} | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <p class="eyebrow">Management</p>
+        <h1>{{ title|default:"Form" }}</h1>
+    </div>
+</div>
+<section class="panel form-panel">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle me-2"></i>Save</button>
+    </form>
+</section>
+{% endblock %}

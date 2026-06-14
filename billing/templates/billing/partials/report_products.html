@@ -1,0 +1,10 @@
+<div class="list-stack">
+    {% for product in products %}
+        <div class="mini-row">
+            <span><strong>{{ product.name }}</strong><small>Sold: {{ product.sold|default:0 }}</small></span>
+            <b>Rs. {{ product.revenue|default:0 }}</b>
+        </div>
+    {% empty %}
+        <p class="empty">No sales yet.</p>
+    {% endfor %}
+</div>

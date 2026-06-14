@@ -1,0 +1,36 @@
+{% extends 'billing/base.html' %}
+{% block title %}Products | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><p class="eyebrow">Inventory</p><h1>Products</h1></div>
+    <a class="btn btn-primary" href="{% url 'product_add' %}"><i class="bi bi-plus-circle me-2"></i>Add Product</a>
+</div>
+<section class="panel">
+    <form class="toolbar" method="get">
+        <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search products">
+        <button class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+    </form>
+    <div class="table-responsive">
+        <table class="table data-table align-middle">
+            <thead><tr><th>Image</th><th>Name</th><th>Barcode</th><th>Category</th><th>Price</th><th>Qty</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for product in object_list %}
+                <tr>
+                    <td>{% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<span class="thumb placeholder"><i class="bi bi-box"></i></span>{% endif %}</td>
+                    <td><strong>{{ product.name }}</strong><small>{{ product.brand }}</small></td>
+                    <td><img class="barcode-img" src="{% url 'product_barcode' product.pk %}" alt="{{ product.barcode }}"><small>{{ product.barcode }}</small></td>
+                    <td>{{ product.category|default:"Uncategorized" }}</td>
+                    <td>Rs. {{ product.selling_price }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td><span class="stock-pill {{ product.stock_status }}">{{ product.stock_status|title }}</span></td>
+                    <td class="actions">
+                        <a class="icon-btn" title="Edit" href="{% url 'product_edit' product.pk %}"><i class="bi bi-pencil"></i></a>
+                        <a class="icon-btn danger" title="Delete" href="{% url 'product_delete' product.pk %}"><i class="bi bi-trash3"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,277 @@
+{% extends 'billing/base.html' %}
+{% load static %}
+{% block title %}Dashboard | Smart Supermarket{% endblock %}
+{% block content %}
+<div class="dashboard-suite">
+    <section class="dashboard-hero" data-aos="fade-up">
+        <div>
+            <p class="eyebrow">Executive Overview</p>
+            <h1>Welcome Back, Admin 👋</h1>
+            <p>Here's what's happening in your supermarket today.</p>
+            <div class="hero-meta">
+                <span><i class="bi bi-calendar3"></i>{{ today_date|date:"l, d M Y" }}</span>
+                <span><i class="bi bi-clock-history"></i><b id="dashboardClock">--:--</b></span>
+            </div>
+        </div>
+        <div class="hero-actions">
+            <a class="btn btn-light" href="{% url 'billing' %}"><i class="bi bi-receipt-cutoff me-2"></i>Create Bill</a>
+            <a class="btn btn-primary" href="{% url 'reports' %}"><i class="bi bi-file-earmark-bar-graph me-2"></i>Reports</a>
+        </div>
+    </section>
+
+    <section class="kpi-grid">
+        <article class="kpi-card gradient-blue" data-aos="fade-up" data-aos-delay="50">
+            <div class="kpi-icon"><i class="bi bi-currency-rupee"></i></div>
+            <span>Total Revenue</span>
+            <strong class="counter" data-count="{{ total_revenue }}">0</strong>
+            <small><i class="bi bi-arrow-up-right"></i> {{ revenue_delta }}% trend</small>
+            <canvas class="mini-chart" id="kpiRevenue"></canvas>
+        </article>
+        <article class="kpi-card gradient-emerald" data-aos="fade-up" data-aos-delay="100">
+            <div class="kpi-icon"><i class="bi bi-bag-check"></i></div>
+            <span>Today's Sales</span>
+            <strong class="counter" data-count="{{ total_sales_today }}">0</strong>
+            <small><i class="bi bi-arrow-up-right"></i> Live billing count</small>
+            <canvas class="mini-chart" id="kpiSales"></canvas>
+        </article>
+        <article class="kpi-card gradient-purple" data-aos="fade-up" data-aos-delay="150">
+            <div class="kpi-icon"><i class="bi bi-people"></i></div>
+            <span>Total Customers</span>
+            <strong class="counter" data-count="{{ total_customers }}">0</strong>
+            <small><i class="bi bi-arrow-up-right"></i> Loyalty base</small>
+            <canvas class="mini-chart" id="kpiCustomers"></canvas>
+        </article>
+        <article class="kpi-card gradient-indigo" data-aos="fade-up" data-aos-delay="200">
+            <div class="kpi-icon"><i class="bi bi-box-seam"></i></div>
+            <span>Total Products</span>
+            <strong class="counter" data-count="{{ total_products }}">0</strong>
+            <small><i class="bi bi-grid-3x3-gap"></i> Active SKUs</small>
+            <canvas class="mini-chart" id="kpiProducts"></canvas>
+        </article>
+        <article class="kpi-card gradient-amber" data-aos="fade-up" data-aos-delay="250">
+            <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
+            <span>Bills Generated Today</span>
+            <strong class="counter" data-count="{{ total_sales_today }}">0</strong>
+            <small><i class="bi bi-lightning-charge"></i> Checkout velocity</small>
+            <canvas class="mini-chart" id="kpiBills"></canvas>
+        </article>
+        <article class="kpi-card gradient-red" data-aos="fade-up" data-aos-delay="300">
+            <div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            <span>Low Stock Alerts</span>
+            <strong class="counter" data-count="{{ low_stock_products }}">0</strong>
+            <small><i class="bi bi-shield-exclamation"></i> Needs attention</small>
+            <canvas class="mini-chart" id="kpiStock"></canvas>
+        </article>
+    </section>
+
+    <section class="dashboard-layout">
+        <div class="dashboard-main">
+            {{ charts|json_script:"dashboardCharts" }}
+            <div class="chart-grid premium-chart-grid">
+                <article class="panel chart-panel span-2" data-aos="fade-up">
+                    <div class="panel-head">
+                        <div>
+                            <p class="eyebrow">Analytics</p>
+                            <h2>Monthly Revenue Trend</h2>
+                        </div>
+                        <span class="soft-badge">Interactive</span>
+                    </div>
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </article>
+                <article class="panel chart-panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Weekly Sales Performance</h2><i class="bi bi-activity"></i></div>
+                    <canvas id="weeklySalesChart"></canvas>
+                </article>
+                <article class="panel chart-panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Top Selling Products</h2><i class="bi bi-bar-chart"></i></div>
+                    <canvas id="topProductsChart"></canvas>
+                </article>
+                <article class="panel chart-panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Customer Growth</h2><i class="bi bi-person-plus"></i></div>
+                    <canvas id="customerGrowthChart"></canvas>
+                </article>
+                <article class="panel chart-panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Revenue vs Expenses</h2><i class="bi bi-bank"></i></div>
+                    <canvas id="revenueExpenseChart"></canvas>
+                </article>
+                <article class="panel chart-panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Category Distribution</h2><i class="bi bi-pie-chart"></i></div>
+                    <canvas id="categoryChart"></canvas>
+                </article>
+            </div>
+
+            <section class="insight-grid" data-aos="fade-up">
+                {% for insight in smart_insights %}
+                    <article class="insight-card {{ insight.tone }}">
+                        <span><i class="bi {{ insight.icon }}"></i></span>
+                        <p>{{ insight.text }}</p>
+                    </article>
+                {% endfor %}
+            </section>
+
+            <article class="panel sales-panel" data-aos="fade-up">
+                <div class="panel-head">
+                    <div>
+                        <p class="eyebrow">Transactions</p>
+                        <h2>Recent Sales</h2>
+                    </div>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'sales_history' %}">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table premium-table {% if recent_sales %}data-table{% endif %} align-middle" id="recentSalesTable">
+                        <thead>
+                            <tr>
+                                <th>Invoice Number</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bill in recent_sales %}
+                                <tr>
+                                    <td><a href="{% url 'bill_detail' bill.pk %}"><strong>{{ bill.invoice_number }}</strong></a></td>
+                                    <td>{{ bill.customer_name }}</td>
+                                    <td>{{ bill.items.count }}</td>
+                                    <td><strong>Rs. {{ bill.grand_total }}</strong></td>
+                                    <td><span class="payment-pill">{{ bill.get_payment_method_display }}</span></td>
+                                    <td>{{ bill.created_at|date:"d M Y, h:i A" }}</td>
+                                    <td><span class="status-pill success">Paid</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7">No recent sales available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <section class="commerce-grid">
+                <article class="panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Low Stock Panel</h2><a href="{% url 'stock_alerts' %}">Manage</a></div>
+                    <div class="inventory-list">
+                        {% for product in low_stock_items %}
+                            <a class="media-row" href="{% url 'product_edit' product.pk %}">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <span class="media-placeholder"><i class="bi bi-box-seam"></i></span>
+                                {% endif %}
+                                <span><strong>{{ product.name }}</strong><small>Current Stock: {{ product.quantity }}</small></span>
+                                <b class="stock-pill {{ product.stock_status }}">{{ product.stock_status|title }}</b>
+                            </a>
+                        {% empty %}
+                            <p class="empty">Inventory levels are healthy.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Top Products</h2><a href="{% url 'analytics' %}">Analytics</a></div>
+                    <div class="inventory-list">
+                        {% for product in top_product_panels %}
+                            <a class="media-row" href="{% url 'product_edit' product.pk %}">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <span class="media-placeholder emerald"><i class="bi bi-bag-heart"></i></span>
+                                {% endif %}
+                                <span><strong>{{ product.name }}</strong><small>{{ product.units_sold|default:0 }} units sold</small></span>
+                                <b>Rs. {{ product.revenue_generated|default:0 }}</b>
+                            </a>
+                        {% empty %}
+                            <p class="empty">No product sales yet.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Recent Customers</h2><a href="{% url 'customer_list' %}">Directory</a></div>
+                    <div class="inventory-list">
+                        {% for customer in recent_customer_panels %}
+                            <a class="media-row" href="{% url 'customer_history' customer.pk %}">
+                                <span class="customer-avatar">{{ customer.name|slice:":1"|upper }}</span>
+                                <span><strong>{{ customer.name }}</strong><small>{{ customer.phone }}</small></span>
+                                <span class="text-end"><small>Last Purchase</small><b>Rs. {{ customer.total_purchases }}</b></span>
+                            </a>
+                        {% empty %}
+                            <p class="empty">No customers yet.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="panel quick-panel" data-aos="fade-up">
+                    <div class="panel-head"><h2>Quick Actions</h2><i class="bi bi-lightning-charge"></i></div>
+                    <div class="quick-actions">
+                        <a href="{% url 'billing' %}"><i class="bi bi-receipt-cutoff"></i>Create Bill</a>
+                        <a href="{% url 'product_add' %}"><i class="bi bi-plus-square"></i>Add Product</a>
+                        <a href="{% url 'customer_add' %}"><i class="bi bi-person-plus"></i>Add Customer</a>
+                        <a href="{% url 'reports' %}"><i class="bi bi-file-earmark-arrow-down"></i>Generate Report</a>
+                        <a href="{% url 'analytics' %}"><i class="bi bi-graph-up-arrow"></i>View Analytics</a>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <aside class="right-rail" data-aos="fade-left">
+            <article class="rail-card revenue-card">
+                <span>Today's Revenue</span>
+                <strong>Rs. {{ today_revenue }}</strong>
+                <small>{{ total_sales_today }} bills processed today</small>
+            </article>
+            <article class="rail-card">
+                <div class="panel-head"><h2>Pending Tasks</h2><span class="soft-badge">{{ pending_tasks }}</span></div>
+                <div class="task-list">
+                    <span><i class="bi bi-exclamation-circle text-danger"></i>{{ critical_stock_count }} critical stock items</span>
+                    <span><i class="bi bi-box-seam text-warning"></i>{{ low_stock_products }} reorder checks</span>
+                    <span><i class="bi bi-check2-circle text-success"></i>{{ healthy_stock_count }} healthy SKUs</span>
+                </div>
+            </article>
+            <article class="rail-card">
+                <div class="panel-head"><h2>Low Stock Notifications</h2></div>
+                <div class="task-list">
+                    {% for alert in unresolved_alerts %}
+                        <span><i class="bi bi-bell text-warning"></i>{{ alert.message }}</span>
+                    {% empty %}
+                        <span><i class="bi bi-check-circle text-success"></i>No unresolved stock alerts</span>
+                    {% endfor %}
+                </div>
+            </article>
+            <article class="rail-card">
+                <div class="panel-head"><h2>Recent Activities</h2></div>
+                <div class="timeline">
+                    {% for bill in recent_sales|slice:":4" %}
+                        <span><i></i>Invoice {{ bill.invoice_number }} generated for Rs. {{ bill.grand_total }}</span>
+                    {% empty %}
+                        <span><i></i>Dashboard initialized with demo-ready analytics.</span>
+                    {% endfor %}
+                </div>
+            </article>
+            <article class="rail-card">
+                <div class="panel-head"><h2>System Status</h2><span class="status-pill success">Online</span></div>
+                <div class="system-meters">
+                    <label>Billing Engine <span>99%</span></label>
+                    <div><span style="width: 99%"></span></div>
+                    <label>Inventory Sync <span>94%</span></label>
+                    <div><span style="width: 94%"></span></div>
+                    <label>Reports Service <span>97%</span></label>
+                    <div><span style="width: 97%"></span></div>
+                </div>
+            </article>
+        </aside>
+    </section>
+</div>
+<footer class="app-footer">
+    <span>Smart Supermarket ERP v2.0</span>
+    <span>Copyright 2026 Smart Supermarket</span>
+    <a href="{% url 'settings' %}">Support</a>
+</footer>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'billing/js/dashboard.js' %}"></script>
+{% endblock %}

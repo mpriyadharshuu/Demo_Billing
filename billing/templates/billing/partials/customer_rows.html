@@ -1,0 +1,10 @@
+<div class="list-stack">
+    {% for customer in customers %}
+        <a class="mini-row" href="{% url 'customer_history' customer.pk %}">
+            <span><strong>{{ customer.name }}</strong><small>{{ customer.phone }}</small></span>
+            <b>Rs. {{ customer.total_purchases }}</b>
+        </a>
+    {% empty %}
+        <p class="empty">No customers yet.</p>
+    {% endfor %}
+</div>
